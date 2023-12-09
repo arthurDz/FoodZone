@@ -18,7 +18,6 @@ import {
 } from '../../utils/deviceDimensions';
 import auth from '@react-native-firebase/auth';
 import InputField from '../../components/InputField';
-import HorizontalLine from '../../components/HorizontalLine';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -67,11 +66,6 @@ const LoginScreen = () => {
               </Text>
             </View>
           </View>
-          {/* <View style={styles.orBox}>
-            <HorizontalLine width="40%" />
-            <Text style={styles.orText}>OR</Text>
-            <HorizontalLine width="40%" />
-          </View> */}
         </View>
       </KeyboardAvoidingView>
     </ScrollView>
