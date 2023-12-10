@@ -16,6 +16,8 @@ import LoginScreen from './screens/AuthScreens/LoginScreen';
 import AppRoutes from './navigation';
 import { Appearance } from 'react-native';
 import Colors from './utils/Colors';
+import { Provider } from 'react-redux';
+import store from './redux/store';
 // import Firebase from '@react-native-firebase/app';
 
 // Set the app appearance to "light"
@@ -25,9 +27,11 @@ Appearance.setColorScheme('light');
 function App(): JSX.Element {
 
   return (
+    <Provider store={store}>
     <SafeAreaView style={styles.container}>
       <AppRoutes />
     </SafeAreaView>
+    </Provider>
   );
 }
 

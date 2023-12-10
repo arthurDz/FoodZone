@@ -8,7 +8,10 @@ import {
 
 const AddItemInCart = ({onPress}) => {
   return (
-    <TouchableOpacity style={styles.btnStyle} onPress={onPress}>
+    <TouchableOpacity
+      style={styles.btnStyle}
+      onPress={onPress}
+      activeOpacity={1}>
       <Text style={styles.btnText}>ADD</Text>
     </TouchableOpacity>
   );

@@ -1,10 +1,11 @@
 const Colors = {
   primary: {
-    bgPrimary: '#F2FDFF',
+    bgPrimary: '#F0F8FF',
     textColorPrimary: '#325CBB',
     bgBtnPrimary: '#FF6347',
     inputBackground: '#EDF3F8',
     redShade: '#ED1849',
+    redShade1: '#E52B50',
     pinkShade1: '#FF7E8B',
     pinkShade2: '#FFF1F3',
     greenShade1: '#267E3E',

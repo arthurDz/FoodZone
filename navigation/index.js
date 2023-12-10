@@ -6,9 +6,12 @@ import HomeScreen from '../screens/HomeScreen';
 import RestaurantScreen from '../screens/RestaurantScreen';
 import {getValueFromAsyncStorage} from '../utils/AsyncStorageHelpers';
 import AppConstants from '../utils/AppConstants';
+import {Text} from 'react-native';
+import CartScreen from '../screens/CartScreen';
 
 const AppRoutes = () => {
   const [isLogin, setIsLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const Stack = createNativeStackNavigator();
 
@@ -22,10 +25,15 @@ const AppRoutes = () => {
       } catch (error) {
         console.log('Error retrieving login status: ', error);
       }
+      setIsLoading(false);
     };
 
     checkLoginStatus();
-  }, [isLogin]);
+  }, [isLoading]);
+
+  if (isLoading) {
+    return <Text>isLoading</Text>;
+  }
 
   return (
     <NavigationContainer>
@@ -43,6 +51,11 @@ const AppRoutes = () => {
         <Stack.Screen
           name="Restaurant"
           component={RestaurantScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Cart"
+          component={CartScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

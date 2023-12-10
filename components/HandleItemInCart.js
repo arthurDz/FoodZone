@@ -6,16 +6,26 @@ import {
 } from '../utils/deviceDimensions';
 import Colors from '../utils/Colors';
 
-const HandleItemInCart = ({onPressInc, onPressDec}) => {
+const HandleItemInCart = ({
+  onPressInc,
+  onPressDec,
+  itemQty,
+  btnStyle,
+  btnTextStyle,
+}) => {
   return (
-    <View style={styles.btnStyle}>
-      <Text onPress={onPressDec} style={styles.btnTxtStyle}>
+    <View style={[styles.btnStyle, {...btnStyle}]}>
+      <Text
+        onPress={onPressDec}
+        style={[styles.btnTxtStyle, {...btnTextStyle}]}>
         -
       </Text>
 
-      <Text style={styles.btnTxtStyle}>1</Text>
+      <Text style={[styles.btnTxtStyle, {...btnTextStyle}]}>{itemQty}</Text>
 
-      <Text onPress={onPressInc} style={styles.btnTxtStyle}>
+      <Text
+        onPress={onPressInc}
+        style={[styles.btnTxtStyle, {...btnTextStyle}]}>
         +
       </Text>
     </View>
@@ -32,7 +42,7 @@ const styles = StyleSheet.create({
     width: setValueBasedOnWidth(100),
     paddingVertical: setValueBasedOnHeight(5),
     position: 'absolute',
-    backgroundColor: Colors.primary.redShade,
+    backgroundColor: Colors.primary.redShade1,
     borderRadius: 6,
     alignSelf: 'center',
     bottom: -15,

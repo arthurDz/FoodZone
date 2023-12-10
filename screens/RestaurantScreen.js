@@ -5,7 +5,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image,
 } from 'react-native';
 import React, {useState} from 'react';
 import Colors from '../utils/Colors';
@@ -13,20 +12,22 @@ import {
   setValueBasedOnHeight,
   setValueBasedOnWidth,
 } from '../utils/deviceDimensions';
-import AddItemInCart from '../components/AddItemInCart';
-import HandleItemInCart from '../components/HandleItemInCart';
 import RatingBox from '../components/RatingBox';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MenuItem from '../components/MenuItem';
+import {useSelector} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
+import Header from '../components/Header';
 
 const RestaurantScreen = props => {
   const restaurantDetails = props.route.params?.data;
   const restDistance = props.route.params?.distance;
+  const navigation = useNavigation();
+
+  const cart = useSelector(state => state.cart.cart);
 
   const [collapsed, setCollapsed] = useState({});
-
-  const isItemInCart = itemId => {
-    return true;
-  };
 
   const toggleCollapse = category => {
     setCollapsed(prevCollapsed => ({
@@ -35,28 +36,7 @@ const RestaurantScreen = props => {
     }));
   };
 
-  const renderMenuItem = menuItem => (
-    <View style={styles.menuItem}>
-      <View style={styles.menuItemDescBox}>
-        <Text style={styles.menuItemName}>{menuItem?.name}</Text>
-        <RatingBox rating={menuItem?.rating} />
-        <Text style={styles.menuItemPrice}>{`₹${menuItem?.price}`}</Text>
-        <Text style={styles.menuItemDesc}>{menuItem?.description}</Text>
-      </View>
-
-      <View>
-        <Image source={{uri: menuItem?.image}} style={styles.menuItemImg} />
-        {!isItemInCart(menuItem?.id) ? (
-          <AddItemInCart onPress={() => console.log('AddItemInCart pressed')} />
-        ) : (
-          <HandleItemInCart
-            onPressDec={() => console.log('dec')}
-            onPressInc={() => console.log('inc')}
-          />
-        )}
-      </View>
-    </View>
-  );
+  const totalQty = cart.reduce((tq, item) => tq + Number(item?.quantity), 0);
 
   const renderCategory = ({item}) => (
     <View style={styles.categoryCont}>
@@ -75,41 +55,71 @@ const RestaurantScreen = props => {
           style={{flexGrow: 1}}
           data={item.items}
           keyExtractor={menuItem => menuItem.id}
-          renderItem={({item: menuItem}) => renderMenuItem(menuItem)}
+          renderItem={({item: menuItem}) => <MenuItem menuItem={menuItem} />}
         />
       )}
     </View>
   );
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.restaurantDetails}>
-        <Text style={styles.restaurantName}>{restaurantDetails?.name}</Text>
-        <Text style={styles.restaurantCuisines}>
-          {restaurantDetails?.cuisines}
-        </Text>
-        <RatingBox rating={restaurantDetails?.aggregate_rating} />
-        <View style={styles.restaurantTimeDist}>
-          <AntDesign
-            name="clockcircle"
-            color={Colors.primary.greenShade1}
-            size={setValueBasedOnHeight(10)}
-          />
-          <Text
-            style={
-              styles.restaurantTimeDistText
-            }>{`${restaurantDetails?.time} | ${restDistance} km | ${restaurantDetails?.smalladress}`}</Text>
+    <>
+      <Header onIconPress={() => navigation.goBack()} />
+      <ScrollView style={styles.container}>
+        <View style={styles.restaurantDetails}>
+          <Text style={styles.restaurantName}>{restaurantDetails?.name}</Text>
+          <Text style={styles.restaurantCuisines}>
+            {restaurantDetails?.cuisines}
+          </Text>
+          <RatingBox rating={restaurantDetails?.aggregate_rating} />
+          <View style={styles.restaurantTimeDist}>
+            <AntDesign
+              name="clockcircle"
+              color={Colors.primary.greenShade1}
+              size={setValueBasedOnHeight(10)}
+            />
+            <Text
+              style={
+                styles.restaurantTimeDistText
+              }>{`${restaurantDetails?.time} | ${restDistance} km | ${restaurantDetails?.smalladress}`}</Text>
+          </View>
         </View>
-      </View>
 
-      {/* Menu */}
-      <FlatList
-        data={restaurantDetails?.menu}
-        keyExtractor={category => category.id}
-        renderItem={renderCategory}
-        style={{flexGrow: 1}}
-      />
-    </ScrollView>
+        {/* Menu */}
+        <FlatList
+          data={restaurantDetails?.menu}
+          keyExtractor={category => category.id}
+          renderItem={renderCategory}
+          style={{flexGrow: 1}}
+        />
+      </ScrollView>
+
+      {cart.length > 0 && (
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.goToCartBtn}
+          onPress={() =>
+            navigation.navigate('Cart', {name: restaurantDetails?.name})
+          }>
+          <View style={styles.goToCartBtnText}>
+            <Text style={styles.goToCartBtnMainText}>
+              {totalQty > 1
+                ? `${totalQty} items added`
+                : `${totalQty} item added`}
+            </Text>
+            <Ionicons
+              name="arrow-forward-circle"
+              color={Colors.singletons.white}
+              size={setValueBasedOnHeight(14)}
+            />
+          </View>
+          <Text style={styles.goToCartBtnSubText}>
+            {totalQty >= 3
+              ? `Yay! You have unlocked free delivery`
+              : `Add ${3 - totalQty} more item to get free delivery`}
+          </Text>
+        </TouchableOpacity>
+      )}
+    </>
   );
 };
 
@@ -121,11 +131,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary.bgPrimary,
   },
   restaurantDetails: {
-    marginVertical: setValueBasedOnHeight(10),
-    alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'space-around',
-    height: setValueBasedOnHeight(100),
+    height: setValueBasedOnHeight(110),
+    backgroundColor: Colors.singletons.white,
+    width: '100%',
   },
   restaurantName: {
     fontSize: setValueBasedOnHeight(20),
@@ -151,28 +161,9 @@ const styles = StyleSheet.create({
   },
   categoryName: {
     fontWeight: '700',
-    fontSize: setValueBasedOnHeight(14),
+    fontSize: setValueBasedOnHeight(16),
     maxWidth: '60%',
     color: Colors.singletons.black,
-  },
-  menuItem: {
-    borderBottomColor: Colors.singletons.gray,
-    borderBottomWidth: 1,
-    borderStyle: 'dashed',
-    paddingTop: setValueBasedOnHeight(14),
-    paddingBottom: setValueBasedOnHeight(24),
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  menuItemDescBox: {
-    flex: 0.7,
-  },
-  menuItemImg: {
-    position: 'relative',
-    borderRadius: 8,
-    width: 140,
-    height: 140,
   },
   restaurantTimeDist: {
     borderRadius: 14,
@@ -187,20 +178,24 @@ const styles = StyleSheet.create({
     fontSize: setValueBasedOnHeight(10),
     marginLeft: setValueBasedOnWidth(5),
   },
-  menuItemName: {
+  goToCartBtn: {
+    backgroundColor: Colors.primary.redShade1,
+    alignItems: 'center',
+    paddingHorizontal: setValueBasedOnWidth(12),
+    paddingVertical: setValueBasedOnHeight(10),
+  },
+  goToCartBtnText: {flexDirection: 'row', alignItems: 'center'},
+  goToCartBtnMainText: {
+    textAlign: 'center',
     fontSize: setValueBasedOnHeight(14),
-    color: Colors.singletons.black,
-    fontWeight: '700',
-    marginBottom: setValueBasedOnHeight(8),
+    color: Colors.singletons.white,
+    fontWeight: '600',
+    marginRight: setValueBasedOnWidth(5),
   },
-  menuItemDesc: {
-    fontSize: setValueBasedOnHeight(10),
-    color: Colors.singletons.gray,
-  },
-  menuItemPrice: {
+  goToCartBtnSubText: {
+    textAlign: 'center',
     fontSize: setValueBasedOnHeight(12),
-    color: Colors.singletons.black,
-    fontWeight: '700',
-    marginTop: setValueBasedOnHeight(8),
+    color: Colors.singletons.white,
+    fontWeight: '400',
   },
 });

@@ -1,12 +1,22 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import Colors from '../utils/Colors';
-import {setValueBasedOnHeight} from '../utils/deviceDimensions';
+import {
+  setValueBasedOnHeight,
+  setValueBasedOnWidth,
+} from '../utils/deviceDimensions';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
-const Header = ({onIconPress, title, icon, children, titleStyle}) => {
+const Header = ({
+  onIconPress,
+  title,
+  icon,
+  children,
+  titleStyle,
+  headerStyles,
+}) => {
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, {...headerStyles}]}>
       <TouchableOpacity onPress={onIconPress} style={styles.iconContainer}>
         {icon ? (
           icon
@@ -37,33 +47,24 @@ export default Header;
 const styles = StyleSheet.create({
   header: {
     height: setValueBasedOnHeight(40),
-    backgroundColor: Colors.primary.bgPrimary,
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 3.84,
-    // elevation: 5,
-    marginBottom: setValueBasedOnHeight(10),
+    backgroundColor: Colors.singletons.white,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 10,
   },
   iconContainer: {
     width: 30,
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: setValueBasedOnWidth(10),
   },
   titleContainer: {
-    flex: 1,
     alignItems: 'center',
   },
   titleText: {
-    fontSize: setValueBasedOnHeight(18),
+    fontSize: setValueBasedOnHeight(14),
     fontWeight: '700',
+    color: Colors.singletons.black,
   },
   customContentContainer: {
     flex: 1,

@@ -16,11 +16,11 @@ export default [
     time: '32 min',
     menu: [
       {
-        id: '20',
+        id: '240',
         category: 'Recommended',
         items: [
           {
-            id: '101',
+            id: '479',
             name: 'Paneer 65',
             price: 275,
             description:
@@ -34,7 +34,7 @@ export default [
             quantity: 1,
           },
           {
-            id: '102',
+            id: '581',
             name: 'Chilly Chicken (Boneless)',
             price: 285,
             description:
@@ -48,7 +48,7 @@ export default [
             quantity: 1,
           },
           {
-            id: '103',
+            id: '106',
             name: 'Spl Veg Biryani',
             price: 250,
             description:
@@ -62,7 +62,7 @@ export default [
             quantity: 1,
           },
           {
-            id: '104',
+            id: '694',
             name: 'Chilly Paneer',
             price: 220,
             description:
@@ -76,7 +76,7 @@ export default [
             quantity: 1,
           },
           {
-            id: '105',
+            id: '459',
             name: 'Chicken 65',
             price: 300,
             description:
@@ -92,11 +92,11 @@ export default [
         ],
       },
       {
-        id: '11',
+        id: '114',
         category: 'Rice',
         items: [
           {
-            id: '201',
+            id: '362',
             name: 'Chicken Fried Rice',
             price: 260,
             description:
@@ -150,11 +150,11 @@ export default [
         ],
       },
       {
-        id: '12',
+        id: '465',
         category: 'Tacos',
         items: [
           {
-            'id:': '101',
+            'id:': '362',
             veg: 'true',
             name: 'Naked Veggie Taco',
             image:
@@ -168,7 +168,7 @@ export default [
               'A crusted & spice coated plant-based protein patty Taco, layered with warm nacho cheese, lettuce, our signature Mexican Pico De Gallo – a tangy tomato & onion mix along with the goodness of mozzarella and cheddar cheese blend. KCAL 208.02',
           },
           {
-            id: '102',
+            id: '802',
             veg: 'true',
             name: 'Crunchy Taco Pinto Bean',
             image:
@@ -182,7 +182,7 @@ export default [
               "It's crunchy. It's delicious! Our signature product served with pinto beans & zesty ranch sauce.",
           },
           {
-            id: '103',
+            id: '978',
             veg: 'false',
             name: 'CRUNCHY TACOS NON VEG',
             image:
@@ -196,7 +196,7 @@ export default [
               "It's crunchy. It's delicious! Our signature product served with Mexican chicken & zesty ranch sauce.",
           },
           {
-            id: '105',
+            id: '367',
             veg: 'true',
             name: 'Soft Taco Mexican Paneer',
             image:

@@ -3,7 +3,10 @@ import React from 'react';
 import hotels from '../utils/data/hotels';
 import Colors from '../utils/Colors';
 import RestaurantCard from '../components/RestaurantCard';
-import {setValueBasedOnHeight} from '../utils/deviceDimensions';
+import {
+  setValueBasedOnHeight,
+  setValueBasedOnWidth,
+} from '../utils/deviceDimensions';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,11 +37,8 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View>
-        <Text>Filters</Text>
-      </View>
-
-      <TouchableOpacity
+      <View
+        style={styles.header}
         onPress={() => {
           auth()
             .signOut()
@@ -48,10 +48,11 @@ const HomeScreen = () => {
               navigation.reset({index: 0, routes: [{name: 'AuthRoute'}]});
             });
         }}>
-        <Text>LOG OUT!!!</Text>
-      </TouchableOpacity>
+        <Text style={styles.appName}>Food Zone</Text>
+        <Text style={styles.logout}>Log out</Text>
+      </View>
 
-      <Text style={styles.allRestaurantsTxt}>All Restaurants</Text>
+      <Text style={styles.heading}>All Restaurants</Text>
 
       {/* List of all Restaurants */}
       <FlatList
@@ -77,6 +78,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.primary.bgPrimary,
   },
+  header: {
+    flexDirection: 'row',
+    height: setValueBasedOnHeight(40),
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: setValueBasedOnHeight(5),
+    paddingHorizontal: setValueBasedOnWidth(8),
+    backgroundColor: Colors.singletons.white,
+  },
+  appName: {
+    fontSize: setValueBasedOnHeight(12),
+    color: Colors.primary.redShade,
+    fontWeight: '600',
+  },
+  logout: {
+    fontSize: setValueBasedOnHeight(12),
+    color: Colors.singletons.gray,
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+  },
   allRestaurantsTxt: {
     textTransform: 'uppercase',
     fontSize: setValueBasedOnHeight(12),
@@ -85,5 +106,13 @@ const styles = StyleSheet.create({
   },
   restaurantList: {
     flexGrow: 1,
+  },
+  heading: {
+    color: Colors.singletons.gray,
+    letterSpacing: 3,
+    fontSize: setValueBasedOnHeight(12),
+    textAlign: 'center',
+    marginVertical: setValueBasedOnHeight(5),
+    textTransform: 'uppercase',
   },
 });
