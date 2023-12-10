@@ -1,23 +1,22 @@
 import {
-  Image,
   StyleSheet,
   Text,
-  ScrollView,
   KeyboardAvoidingView,
   TouchableOpacity,
   View,
+  SafeAreaView,
 } from 'react-native';
 import React, {useState} from 'react';
 import Colors from '../../utils/Colors';
-import Header from '../../components/Header';
 import {useNavigation} from '@react-navigation/native';
-import LoginImg from '../../assets/images/loginImg.png';
 import {
   setValueBasedOnHeight,
   setValueBasedOnWidth,
 } from '../../utils/deviceDimensions';
 import auth from '@react-native-firebase/auth';
 import InputField from '../../components/InputField';
+import AppConstants from '../../utils/AppConstants';
+import {setValueInAsyncStorage} from '../../utils/AsyncStorageHelpers';
 
 const SignupScreen = () => {
   const navigation = useNavigation();
@@ -32,8 +31,21 @@ const SignupScreen = () => {
     if (vaildCreds()) {
       auth()
         .createUserWithEmailAndPassword(user?.email, user?.password)
-        .then(() => {
-          console.log('User account created & signed in!');
+        .then(res => {
+          console.log('User account created & signed in!', res);
+          setValueInAsyncStorage(
+            AppConstants.ASYNC_STORAGE_KEYS.IS_LOGIN,
+            true,
+          );
+          setValueInAsyncStorage(
+            AppConstants.ASYNC_STORAGE_KEYS.AUTH_TOKEN,
+            res?.user?.uid,
+          );
+          setValueInAsyncStorage(
+            AppConstants.ASYNC_STORAGE_KEYS.USER,
+            res?.user,
+          );
+          navigation.reset({index: 0, routes: [{name: 'Home'}]});
         })
         .catch(error => {
           if (error.code === 'auth/email-already-in-use') {
@@ -78,15 +90,15 @@ const SignupScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <KeyboardAvoidingView style={styles.container}>
-        <View>
-          <Header title="" onLeftBtnClick={() => navigation.goBack()} />
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView style={{flex: 1}}>
+        <View style={styles.signupBox}>
+          <View style={styles.signupBoxHeader}>
+            <Text style={styles.appName}>Food Zone</Text>
+            <Text style={styles.signupHeader}>Create a free account</Text>
+          </View>
 
-          <Text style={styles.signupHeader}>Signup</Text>
-
-          <View style={styles.signupBox}>
-            <Image source={LoginImg} style={styles.signupImg} />
+          <View style={styles.signupBoxInput}>
             <InputField
               placeholder="Enter Email Id"
               value={user?.email}
@@ -102,32 +114,47 @@ const SignupScreen = () => {
             <TouchableOpacity onPress={handleSignup} style={styles.sigupBtn}>
               <Text style={styles.sigupBtnTxt}>Signup</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.loginBox}
+              onPress={() => navigation.navigate('login')}>
+              <Text>Already have a account?</Text>
+              <Text style={styles.loginBoxText}>LogIn</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </KeyboardAvoidingView>
-    </ScrollView>
+    </SafeAreaView>
   );
 };
 
 export default SignupScreen;
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: Colors.primary.bgPrimary,
   },
+  appName: {
+    fontSize: setValueBasedOnHeight(20),
+    color: Colors.primary.redShade,
+  },
   signupHeader: {
-    fontSize: setValueBasedOnHeight(30),
+    fontSize: setValueBasedOnHeight(14),
     fontWeight: '700',
     color: Colors.singletons.black,
   },
   signupBox: {
-    alignItems: 'center',
+    flex: 1,
     marginVertical: setValueBasedOnHeight(20),
-    marginHorizontal: setValueBasedOnWidth(15),
+    justifyContent: 'space-between',
+    paddingHorizontal: setValueBasedOnWidth(18),
+  },
+  signupBoxHeader: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  signupBoxInput: {
+    flex: 2,
   },
   signupImg: {
     height: setValueBasedOnHeight(250),
@@ -162,5 +189,16 @@ const styles = StyleSheet.create({
   },
   err: {
     color: Colors.primary.redShade,
+  },
+  loginBox: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginTop: setValueBasedOnHeight(10),
+  },
+  loginBoxText: {
+    color: Colors.primary.bgBtnPrimary,
+    fontSize: setValueBasedOnHeight(12),
+    fontWeight: '600',
+    marginLeft: setValueBasedOnWidth(5),
   },
 });

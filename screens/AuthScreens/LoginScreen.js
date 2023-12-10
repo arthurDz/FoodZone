@@ -1,23 +1,23 @@
 import {
-  Image,
   StyleSheet,
   Text,
-  ScrollView,
   KeyboardAvoidingView,
   TouchableOpacity,
   View,
+  Alert,
+  SafeAreaView,
 } from 'react-native';
 import React, {useState} from 'react';
 import Colors from '../../utils/Colors';
-import Header from '../../components/Header';
 import {useNavigation} from '@react-navigation/native';
-import LoginImg from '../../assets/images/loginImg.png';
 import {
   setValueBasedOnHeight,
   setValueBasedOnWidth,
 } from '../../utils/deviceDimensions';
 import auth from '@react-native-firebase/auth';
 import InputField from '../../components/InputField';
+import {setValueInAsyncStorage} from '../../utils/AsyncStorageHelpers';
+import AppConstants from '../../utils/AppConstants';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -26,77 +26,133 @@ const LoginScreen = () => {
     password: '',
   });
 
-  const handleSignin = () => {};
+  const [err, setErr] = useState('');
 
-  const handleInputField = type => {
-    console.log(type);
+  const handleSignin = () => {
+    if (vaildCreds()) {
+      auth()
+        .signInWithEmailAndPassword(user?.email, user?.password)
+        .then(res => {
+          setValueInAsyncStorage(
+            AppConstants.ASYNC_STORAGE_KEYS.IS_LOGIN,
+            true,
+          );
+          setValueInAsyncStorage(
+            AppConstants.ASYNC_STORAGE_KEYS.AUTH_TOKEN,
+            res?.user?.uid,
+          );
+          setValueInAsyncStorage(
+            AppConstants.ASYNC_STORAGE_KEYS.USER,
+            res?.user,
+          );
+          navigation.reset({index: 0, routes: [{name: 'Home'}]});
+        })
+        .catch(error => {
+          if (error.code === 'auth/invalid-email') {
+            Alert.alert('That email address is invalid!');
+          }
+
+          console.error(error);
+        });
+    }
+  };
+
+  const vaildCreds = () => {
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+    if (
+      user?.email === '' ||
+      (emailRegex.test(user?.email) && user?.password === '')
+    ) {
+      setErr('Please input valid email and/or password');
+      return false;
+    } else {
+      setErr('');
+      return true;
+    }
+  };
+
+  const handleInputField = (type, value) => {
+    switch (type) {
+      case 'email':
+        setErr('');
+        setUser({...user, [type]: value});
+        break;
+      case 'password':
+        setErr('');
+        setUser({...user, [type]: value});
+      default:
+        break;
+    }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <KeyboardAvoidingView style={styles.container}>
-        <View>
-          {/* <Header title="Login" onLeftBtnClick={navigation.goBack()} /> */}
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView style={{flex: 1}}>
+        <View style={styles.loginBox}>
+          <View style={styles.loginBoxHeader}>
+            <Text style={styles.appName}>Food Zone</Text>
+            <Text style={styles.loginHeader}>Login to your account</Text>
+          </View>
 
-          <Text style={styles.loginHeader}>Login</Text>
-
-          <View style={styles.loginBox}>
-            <Image source={LoginImg} style={styles.loginImg} />
+          <View style={styles.loginBoxInput}>
             <InputField
               placeholder="Enter Email Id"
               value={user?.email}
-              onChangeText={() => handleInputField('email')}
+              onChangeText={val => handleInputField('email', val)}
             />
             <InputField
               placeholder="Password"
               secureTextEntry
               value={user?.password}
-              onChangeText={() => handleInputField('password')}
+              onChangeText={val => handleInputField('password', val)}
             />
+            {err ? <Text style={styles.err}>{err}</Text> : null}
 
             <TouchableOpacity onPress={handleSignin} style={styles.loginBtn}>
               <Text style={styles.loginBtnTxt}>Login</Text>
             </TouchableOpacity>
-            <View style={styles.signupBox}>
+            <TouchableOpacity
+              style={styles.signupBox}
+              onPress={() => navigation.navigate('signup')}>
               <Text>Don't have a account?</Text>
-              <Text
-                onPress={() => navigation.navigate('signup')}
-                style={styles.signupText}>
-                Signup
-              </Text>
-            </View>
+              <Text style={styles.signupText}>Signup</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </KeyboardAvoidingView>
-    </ScrollView>
+    </SafeAreaView>
   );
 };
 
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: Colors.primary.bgPrimary,
     paddingTop: setValueBasedOnHeight(25),
     paddingHorizontal: setValueBasedOnWidth(18),
   },
-  loginHeader: {
+  appName: {
     fontSize: setValueBasedOnHeight(20),
+    color: Colors.primary.redShade,
+  },
+  loginHeader: {
+    fontSize: setValueBasedOnHeight(14),
     fontWeight: '700',
     color: Colors.singletons.black,
   },
   loginBox: {
-    alignItems: 'center',
+    flex: 1,
     marginVertical: setValueBasedOnHeight(20),
+    justifyContent: 'space-between',
   },
-  loginImg: {
-    height: setValueBasedOnHeight(250),
-    width: setValueBasedOnHeight(250),
-    resizeMode: 'contain',
+  loginBoxHeader: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  loginBoxInput: {
+    flex: 2,
   },
   loginBtn: {
     width: '100%',
@@ -114,7 +170,7 @@ const styles = StyleSheet.create({
   },
   signupBox: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignSelf: 'center',
     marginTop: setValueBasedOnHeight(10),
   },
   signupText: {

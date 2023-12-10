@@ -1,14 +1,25 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 
 const CartScreen = () => {
   return (
-    <View>
-      <Text>CartScreen</Text>
-    </View>
+    <ScrollView style={styles.container}>
+      {/* Items */}
+      <View></View>
+
+      {/* Delivery details */}
+      <View></View>
+
+      {/* Bill details */}
+      <View></View>
+    </ScrollView>
   );
 };
 
 export default CartScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+  },
+});

@@ -1,10 +1,12 @@
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import hotels from '../utils/data/hotels';
 import Colors from '../utils/Colors';
 import RestaurantCard from '../components/RestaurantCard';
 import {setValueBasedOnHeight} from '../utils/deviceDimensions';
 import {useNavigation} from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -35,6 +37,19 @@ const HomeScreen = () => {
       <View>
         <Text>Filters</Text>
       </View>
+
+      <TouchableOpacity
+        onPress={() => {
+          auth()
+            .signOut()
+            .then(() => {
+              console.log('User signed out!');
+              AsyncStorage.clear();
+              navigation.reset({index: 0, routes: [{name: 'AuthRoute'}]});
+            });
+        }}>
+        <Text>LOG OUT!!!</Text>
+      </TouchableOpacity>
 
       <Text style={styles.allRestaurantsTxt}>All Restaurants</Text>
 
