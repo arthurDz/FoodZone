@@ -18,6 +18,9 @@ import auth from '@react-native-firebase/auth';
 import InputField from '../../components/InputField';
 import {setValueInAsyncStorage} from '../../utils/AsyncStorageHelpers';
 import AppConstants from '../../utils/AppConstants';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Feather from 'react-native-vector-icons/Feather';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -27,9 +30,12 @@ const LoginScreen = () => {
   });
 
   const [err, setErr] = useState('');
+  const [hidden, setHidden] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSignin = () => {
     if (vaildCreds()) {
+      setIsLoading(true);
       auth()
         .signInWithEmailAndPassword(user?.email, user?.password)
         .then(res => {
@@ -45,13 +51,12 @@ const LoginScreen = () => {
             AppConstants.ASYNC_STORAGE_KEYS.USER,
             res?.user,
           );
+          setIsLoading(false);
           navigation.reset({index: 0, routes: [{name: 'Home'}]});
         })
         .catch(error => {
-          if (error.code === 'auth/invalid-email') {
-            Alert.alert('That email address is invalid!');
-          }
-
+          Alert.alert('Provided credentials are invalid!');
+          setIsLoading(false);
           console.error(error);
         });
     }
@@ -60,14 +65,15 @@ const LoginScreen = () => {
   const vaildCreds = () => {
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     if (
-      user?.email === '' ||
-      (emailRegex.test(user?.email) && user?.password === '')
+      user?.email !== '' &&
+      emailRegex.test(user?.email) &&
+      user?.password !== ''
     ) {
-      setErr('Please input valid email and/or password');
-      return false;
-    } else {
       setErr('');
       return true;
+    } else {
+      setErr('Please input valid email and/or password');
+      return false;
     }
   };
 
@@ -99,12 +105,37 @@ const LoginScreen = () => {
               placeholder="Enter Email Id"
               value={user?.email}
               onChangeText={val => handleInputField('email', val)}
+              leftIcon={
+                <AntDesign
+                  name="mail"
+                  size={setValueBasedOnHeight(12)}
+                  color={Colors.singletons.gray}
+                />
+              }
             />
             <InputField
               placeholder="Password"
-              secureTextEntry
+              secureTextEntry={hidden}
               value={user?.password}
               onChangeText={val => handleInputField('password', val)}
+              leftIcon={
+                <AntDesign
+                  name="lock1"
+                  size={setValueBasedOnHeight(12)}
+                  color={Colors.singletons.gray}
+                />
+              }
+              rightComponent={
+                <TouchableOpacity
+                  onPress={() => setHidden(!hidden)}
+                  activeOpacity={0.5}>
+                  <Feather
+                    name={hidden ? 'eye' : 'eye-off'}
+                    size={setValueBasedOnHeight(12)}
+                    color={Colors.singletons.gray}
+                  />
+                </TouchableOpacity>
+              }
             />
             {err ? <Text style={styles.err}>{err}</Text> : null}
 
@@ -120,6 +151,7 @@ const LoginScreen = () => {
           </View>
         </View>
       </KeyboardAvoidingView>
+      <Spinner visible={isLoading} textContent={'Signing In...'} />
     </SafeAreaView>
   );
 };
@@ -161,6 +193,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: setValueBasedOnHeight(10),
+    marginTop: setValueBasedOnHeight(20),
     borderRadius: 8,
   },
   loginBtnTxt: {
@@ -179,15 +212,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: setValueBasedOnWidth(5),
   },
-  orBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-  orText: {
-    textTransform: 'uppercase',
-    marginHorizontal: setValueBasedOnWidth(10),
-    fontSize: 16,
-    fontWeight: '700',
+  err: {
+    color: Colors.primary.redShade,
   },
 });

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import Colors from '../../utils/Colors';
@@ -17,6 +18,9 @@ import auth from '@react-native-firebase/auth';
 import InputField from '../../components/InputField';
 import AppConstants from '../../utils/AppConstants';
 import {setValueInAsyncStorage} from '../../utils/AsyncStorageHelpers';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Feather from 'react-native-vector-icons/Feather';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const SignupScreen = () => {
   const navigation = useNavigation();
@@ -26,13 +30,15 @@ const SignupScreen = () => {
   });
 
   const [err, setErr] = useState('');
+  const [hidden, setHidden] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSignup = () => {
     if (vaildCreds()) {
+      setIsLoading(true);
       auth()
         .createUserWithEmailAndPassword(user?.email, user?.password)
         .then(res => {
-          console.log('User account created & signed in!', res);
           setValueInAsyncStorage(
             AppConstants.ASYNC_STORAGE_KEYS.IS_LOGIN,
             true,
@@ -45,17 +51,18 @@ const SignupScreen = () => {
             AppConstants.ASYNC_STORAGE_KEYS.USER,
             res?.user,
           );
+          setIsLoading(false);
           navigation.reset({index: 0, routes: [{name: 'Home'}]});
         })
         .catch(error => {
           if (error.code === 'auth/email-already-in-use') {
-            console.log('That email address is already in use!');
+            Alert.alert('That email address is already in use!');
           }
 
           if (error.code === 'auth/invalid-email') {
-            console.log('That email address is invalid!');
+            Alert.alert('That email address is invalid!');
           }
-
+          setIsLoading(false);
           console.error(error);
         });
     }
@@ -64,14 +71,15 @@ const SignupScreen = () => {
   const vaildCreds = () => {
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     if (
-      user?.email === '' ||
-      (emailRegex.test(user?.email) && user?.password === '')
+      user?.email !== '' &&
+      emailRegex.test(user?.email) &&
+      user?.password !== ''
     ) {
-      setErr('Please input valid email and/or password');
-      return false;
-    } else {
       setErr('');
       return true;
+    } else {
+      setErr('Please input valid email and/or password');
+      return false;
     }
   };
 
@@ -103,12 +111,37 @@ const SignupScreen = () => {
               placeholder="Enter Email Id"
               value={user?.email}
               onChangeText={val => handleInputField('email', val)}
+              leftIcon={
+                <AntDesign
+                  name="mail"
+                  size={setValueBasedOnHeight(12)}
+                  color={Colors.singletons.gray}
+                />
+              }
             />
             <InputField
               placeholder="Password"
-              secureTextEntry
+              secureTextEntry={hidden}
               value={user?.password}
               onChangeText={val => handleInputField('password', val)}
+              leftIcon={
+                <AntDesign
+                  name="lock1"
+                  size={setValueBasedOnHeight(12)}
+                  color={Colors.singletons.gray}
+                />
+              }
+              rightComponent={
+                <TouchableOpacity
+                  onPress={() => setHidden(!hidden)}
+                  activeOpacity={0.5}>
+                  <Feather
+                    name={hidden ? 'eye' : 'eye-off'}
+                    size={setValueBasedOnHeight(12)}
+                    color={Colors.singletons.gray}
+                  />
+                </TouchableOpacity>
+              }
             />
             {err ? <Text style={styles.err}>{err}</Text> : null}
             <TouchableOpacity onPress={handleSignup} style={styles.sigupBtn}>
@@ -123,6 +156,7 @@ const SignupScreen = () => {
           </View>
         </View>
       </KeyboardAvoidingView>
+      <Spinner visible={isLoading} textContent={'Signing In...'} />
     </SafeAreaView>
   );
 };
@@ -133,6 +167,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.primary.bgPrimary,
+    paddingTop: setValueBasedOnHeight(25),
+    paddingHorizontal: setValueBasedOnWidth(18),
   },
   appName: {
     fontSize: setValueBasedOnHeight(20),
@@ -147,7 +183,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: setValueBasedOnHeight(20),
     justifyContent: 'space-between',
-    paddingHorizontal: setValueBasedOnWidth(18),
   },
   signupBoxHeader: {
     flex: 1,
@@ -169,23 +204,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: setValueBasedOnHeight(10),
     borderRadius: 8,
-    marginTop: setValueBasedOnHeight(15),
+    marginTop: setValueBasedOnHeight(20),
   },
   sigupBtnTxt: {
     color: Colors.singletons.white,
     fontSize: setValueBasedOnHeight(16),
     fontWeight: '600',
-  },
-  orBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-  orText: {
-    textTransform: 'uppercase',
-    marginHorizontal: setValueBasedOnWidth(10),
-    fontSize: 16,
-    fontWeight: '700',
   },
   err: {
     color: Colors.primary.redShade,

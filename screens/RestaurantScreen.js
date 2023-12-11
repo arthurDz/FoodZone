@@ -65,6 +65,7 @@ const RestaurantScreen = props => {
     <>
       <Header onIconPress={() => navigation.goBack()} />
       <ScrollView style={styles.container}>
+        {/* Details of Restaurants */}
         <View style={styles.restaurantDetails}>
           <Text style={styles.restaurantName}>{restaurantDetails?.name}</Text>
           <Text style={styles.restaurantCuisines}>

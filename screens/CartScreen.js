@@ -104,6 +104,7 @@ const CartScreen = props => {
         </View>
       </ScrollView>
 
+      {/* Payment */}
       <View style={styles.footer}>
         <View>
           <Text style={styles.payUsing}>PAY USING</Text>

@@ -1,7 +1,7 @@
 const Colors = {
   primary: {
     bgPrimary: '#F0F8FF',
-    textColorPrimary: '#325CBB',
+    blueShade1: '#325CBB',
     bgBtnPrimary: '#FF6347',
     inputBackground: '#EDF3F8',
     redShade: '#ED1849',

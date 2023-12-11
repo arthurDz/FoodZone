@@ -113,6 +113,6 @@ const styles = StyleSheet.create({
   },
   offerText: {
     fontSize: setValueBasedOnHeight(10),
-    color: Colors.primary.textColorPrimary,
+    color: Colors.primary.blueShade1,
   },
 });

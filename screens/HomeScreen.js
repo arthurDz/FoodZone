@@ -35,21 +35,22 @@ const HomeScreen = () => {
     return distance.toFixed(2);
   };
 
+  const handleLogout = () => {
+    auth()
+      .signOut()
+      .then(() => {
+        AsyncStorage.clear();
+        navigation.reset({index: 0, routes: [{name: 'AuthRoute'}]});
+      });
+  };
+
   return (
     <View style={styles.container}>
-      <View
-        style={styles.header}
-        onPress={() => {
-          auth()
-            .signOut()
-            .then(() => {
-              console.log('User signed out!');
-              AsyncStorage.clear();
-              navigation.reset({index: 0, routes: [{name: 'AuthRoute'}]});
-            });
-        }}>
+      <View style={styles.header}>
         <Text style={styles.appName}>Food Zone</Text>
-        <Text style={styles.logout}>Log out</Text>
+        <Text style={styles.logout} onPress={handleLogout}>
+          Log out
+        </Text>
       </View>
 
       <Text style={styles.heading}>All Restaurants</Text>
